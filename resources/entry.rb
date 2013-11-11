@@ -22,6 +22,9 @@ default_action :create
 attribute :host, :kind_of => String, :name_attribute => true
 attribute :key, :kind_of => String
 attribute :port, :kind_of => Fixnum, :default => 22
+attribute :file, :kind_of => String, :default => '/etc/ssh/ssh_known_hosts'
+attribute :user, :kind_of => String
+
 
 def initialize(*args)
   super
