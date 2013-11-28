@@ -20,16 +20,17 @@
 action :create do
   key = (new_resource.key || `ssh-keyscan -H -p #{new_resource.port} #{new_resource.host} 2>&1`)
   comment = key.split("\n").first || ""
-  ssh_user = new_resource.user || 'root'
+  ssh_user = new_resource.owner || 'root'
+  file_path = new_resource.file || node['ssh_known_hosts']['file']
 
   Chef::Application.fatal! "Could not resolve #{new_resource.host}" if key =~ /getaddrinfo/
-
-  file_path = new_resource.file || node['ssh_known_hosts']['file']
+  
   # Ensure that the file exists and has minimal content (required by Chef::Util::FileEdit)
   file file_path do
     action        :create
     backup        false
-    user          ssh_user
+    owner         ssh_user
+    group         ssh_user
     content       '# This file must contain at least one line. This is that line.'
     only_if do
       !::File.exists?(file_path) || ::File.new(file_path).readlines.length == 0
